@@ -5,6 +5,7 @@ export points2coords, coords2points, write_arrays_abf, load_arrays_abf, write_mi
 
 include("abf_store.jl")
 include("binning.jl")
+include("delay_embedding.jl")
 
 import Elegans
 import ImageFiltering.KernelFactors: gaussian
