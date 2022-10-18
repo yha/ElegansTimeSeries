@@ -9,13 +9,23 @@ Returns the DE matrix and corresponding indices into `axes(a,dim)` (indices
 where `cond` holds), where an index of 1 corresponds to the first possible slice.
 """
 function delay_embed(a, k; dim=ndims(a), cond=Returns(true))
-	slice(i) = selectdim(a,dim,i+1:i+k)
+	# slice(i) = selectdim(a,dim,i+1:i+k)
+	# min_i, max_i = firstindex(a,dim), lastindex(a,dim)
+	# slices = [vec(slice(i)) for i in (min_i - 1):(max_i - k)]
+	# i = findall(cond, slices)
+	# out = Align(slices[i], 1; slice_axes = (1:(length(a)÷size(a,dim))*k,))
+	# out, i
+    vecs, i = delay_embed_vecs(a, k; dim, cond)
+    aligned = Align(vecs, 1; slice_axes = (1:(length(a)÷size(a,dim))*k,))
+    aligned, i
+end
+
+function delay_embed_vecs(a, k; dim=ndims(a), cond=Returns(true))
+    slice(i) = selectdim(a,dim,i+1:i+k)
 	min_i, max_i = firstindex(a,dim), lastindex(a,dim)
 	slices = [vec(slice(i)) for i in (min_i - 1):(max_i - k)]
 	i = findall(cond, slices)
-	out = Align(slices[i], 1; slice_axes = (1:(length(a)÷size(a,dim))*k,))
-	out, i
-	#Align([vec(slice(i)) for i in firstindex(a,dim)-1:lastindex(a,dim)-k if cond(slice(i))], 1)
+	slices[i], i
 end
 
 allfinite(v) = all(isfinite,v)
