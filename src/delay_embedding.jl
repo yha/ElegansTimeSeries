@@ -1,11 +1,11 @@
 using JuliennedArrays
 
 """
-	y = delay_embed(a, k; dim=ndims(a), cond)
+	y, indices = delay_embed(a, k; dim=ndims(a), cond)
 Delay-embedding (DE) matrix from an array `a` with time along dimension `dim`.
 Each column of `y` is a vectorized slice of `a` of length `k` along dimension `dim`.
 If `cond` is specified, only slices where `cond(slice)` holds are included.
-Returns the DE matrix and corresponding indices into `axes(a,dim)` (indices 
+Returns the DE matrix `y` and corresponding indices into `axes(a,dim)` (indices 
 where `cond` holds), where an index of 1 corresponds to the first possible slice.
 """
 function delay_embed(a, k; dim=ndims(a), cond=Returns(true))
