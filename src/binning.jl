@@ -7,7 +7,7 @@ function bins(ax, nbins)
 end
 fin(x) = !ismissing(x) && isfinite(x)
 bin_means(v::AbstractVector, nbins) = [mean(view(v,i)) for i in bins(eachindex(v), nbins)]
-bin_mean_fin(v::AbstractVector, nbins) = [mean(filter(fin,view(v,i))) for i in bins(eachindex(v), nbins)]
+bin_mean_fin(v::AbstractVector, nbins) = [mean(Iterators.filter(fin,view(v,i))) for i in bins(eachindex(v), nbins)]
 
 # # naive implementation
 # function bin_means_weights(v, nbins)
