@@ -1,12 +1,14 @@
 module ElegansTimeSeries
 
 export points2coords, coords2points, write_arrays_abf, load_arrays_abf, write_mids_abf, load_mids_abf,
-        bin_means_weights
+        bin_means_weights, cv_pca_errs
 
 include("abf_store.jl")
 include("binning.jl")
 include("delay_embedding.jl")
+include("cvpca.jl")
 include("plotting.jl")
+include("logging_utils.jl")
 
 import Elegans
 import ImageFiltering.KernelFactors: gaussian
