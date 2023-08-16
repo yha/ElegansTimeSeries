@@ -1,4 +1,5 @@
 using MultivariateStats
+using StatsBase: sample
 using ProgressLogging
 
 function split_mat(mat, p=0.1)
@@ -44,3 +45,14 @@ function cv_pca_errs(mat, nshuffles, ndims)
     # (; errs)#, var_A)
     errs
 end	
+
+function logdecrease_thr_d_estimates(e, n_resamples, threshold)
+	_, asamples = axes(e.err)
+	
+	map(1:n_resamples) do _
+		i = sample(asamples, length(asamples))
+		μ = mean(e.err[:,i]; dims = 2)[:,1]
+		decrease = diff(.-log10.(μ)) ./ diff(e.ndims)
+		e.ndims[something(findfirst(<(threshold), decrease), length(decrease)) + 1]
+	end
+end
