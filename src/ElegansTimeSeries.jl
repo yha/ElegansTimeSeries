@@ -9,6 +9,7 @@ include("delay_embedding.jl")
 include("cvpca.jl")
 include("plotting.jl")
 include("logging_utils.jl")
+include("paths.jl")
 
 import Elegans
 import ImageFiltering.KernelFactors: gaussian
