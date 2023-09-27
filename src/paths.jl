@@ -32,7 +32,7 @@ paths = let hostname = gethostname()
         video =  "$(homedir())/experiments/reemy"
         contours = "$(homedir())/cached-data/contours"
         midpoints = "$(homedir())/cached-data/midpoints"
-        pop_des = "$(homedir())/cached-data"
+        pop_des = "$(homedir())/cached-data/DEs"
         depca = "$(homedir())/cached-data/DE-PCA"        
     end
 
