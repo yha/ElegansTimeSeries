@@ -5,7 +5,7 @@ A somewhat hacky way to load correct paths for various machines
 paths = let hostname = gethostname()
     if hostname == "bi-sternlab21"
         coord_stats = "H:/coord-stats-binned"
-        video = "U:/experiments/reemy"
+        video = "U:/experiments/"
         contours = "U:/cached-data/contours"
         midpoints = "F:/cached-data/midpoints"
         pop_des = "E:/cached-data/DEs"
@@ -13,7 +13,7 @@ paths = let hostname = gethostname()
         
     elseif hostname == "bi-sternlab33"
         coord_stats = "U:/cached-data/coord-stats-binned"
-        video = "U:/experiments/reemy"
+        video = "U:/experiments/"
         contours = "U:/cached-data/contours"
         midpoints = "U:/cached-data/midpoints"
         pop_des = "U:/cached-data"
@@ -21,7 +21,7 @@ paths = let hostname = gethostname()
 
     elseif hostname == "BI-Sternlab3"
         coord_stats = "U:/cached-data/coord-stats-binned"
-        video = "U:/experiments/reemy"
+        video = "U:/experiments/"
         contours = "U:/cached-data/contours"
         midpoints = "F:/midpoints"
         pop_des = "F:/cached-data/DEs"
@@ -29,11 +29,12 @@ paths = let hostname = gethostname()
 
     else
         coord_stats = "../../coord-stats-binned"
-        video =  "$(homedir())/experiments/reemy"
+        video =  "$(homedir())/experiments/"
         contours = "$(homedir())/cached-data/contours"
         midpoints = "$(homedir())/cached-data/midpoints"
         pop_des = "$(homedir())/cached-data/DEs"
         depca = "$(homedir())/cached-data/DE-PCA"        
+        area = "$(homedir())/cached-data"
     end
 
     depca_individual = "$depca/individuals"
