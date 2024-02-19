@@ -1,0 +1,9 @@
+[paths]
+video =  "../data/experiments/"
+contours = "../data/cached/contours"
+midpoints = "../data/midpoints"
+depca = "../data/DE-PCAs"
+depca_individual = "../data/individual-DE-PCAs"
+depca_bs = "../data/DE-PCAs/bootstraps"
+area = "../data/"
+stages = "../data/"
