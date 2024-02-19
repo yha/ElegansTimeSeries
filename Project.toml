@@ -61,5 +61,5 @@ WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 [compat]
 # DataFrames from v1.3 can't be loaded from `.jld2` files in v1.4
 DataFrames = "~1.3"
-# Mux.jl has wrong compat entry for WebSockets, see Mux issue #513
+# WebIO.jl has wrong compat entry for WebSockets, see WebIO issue #513
 WebSockets = "~1.5"
