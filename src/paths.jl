@@ -45,4 +45,4 @@ depca_vars_filename(depca_params)  = "DE-PCA vars $(meta_string(depca_params)).j
 depca_cv_filename(nwindows, nsamples, depca_params) = 
 	"CV PCA errors, $nwindows windows, $nsamples sample, $(meta_string(depca_params)).jld2" 
 depca_individual_filename(well, maxoutdim, depca_params) = 
-	"DE-PCA $(well.experiment) $(well.well), $(meta_string(depca_params)), maxoutdim=$maxoutdim.jld2"
+	"DE-PCA $(well.experiment), $(well.well), $(meta_string(depca_params)), maxoutdim=$maxoutdim.jld2"
