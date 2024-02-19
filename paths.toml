@@ -1,6 +1,6 @@
 [paths]
 video =  "../data/experiments/"
-contours = "../data/cached/contours"
+contours = "../data/contours"
 midpoints = "../data/midpoints"
 depca = "../data/DE-PCAs"
 depca_individual = "../data/individual-DE-PCAs"
