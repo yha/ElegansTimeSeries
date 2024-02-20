@@ -2,15 +2,15 @@
 local_root = "U:/"
 # paths relative to `local_root`:
 # input midpoints
-midpoints_relpath = "cached-data/midpoints/"
+midpoints_relpath = "data/midpoints/"
 # delay embedding files (intermediate output)
-des_relpath = "cached-data/DEs"
+des_relpath = "data/DEs"
 # outputs files: delay embedding PCAs for population and individuals and related files
-out_relpath = "cached-data/DE-PCA"
+out_relpath = "data/DE-PCA"
 
 # Location of experiment list and `stages.toml` file on local machine. If relative, resolved from project root.
 ex_list_file = "ex-list-example.csv"
-stage_path = "../../elegans/stages.toml"
+stage_path = "../Elegans/stages.toml"
 # Directory for log files. Should be a relative path, which is resolved relative to the project root
 # on each machine.
 logdir = "worker-logs-depca"
