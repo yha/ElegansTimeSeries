@@ -28,11 +28,14 @@ out_relpath       = paths["out_relpath"]
 local_midpoints_path  = "$local_root/$midpoints_relpath"
 remote_midpoints_path = "$remote_root/$midpoints_relpath"
 
-@assert isdir(local_root)
-@assert isdir(local_project_root)
-@assert isdir(local_midpoints_path)
-@assert isfile(ex_list_file)
-@assert isfile(stage_path)
+assert_isdir(path)  = isdir(path)  || error("Not found or not a directory: $path")
+assert_isfile(path) = isfile(path) || error("Not found or not a regular file: $path")
+
+assert_isdir(local_root)
+assert_isdir(local_project_root)
+assert_isdir(local_midpoints_path)
+assert_isfile(ex_list_file)
+assert_isfile(stage_path)
 
 ##
 using Distributed
