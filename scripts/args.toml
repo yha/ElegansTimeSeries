@@ -1,0 +1,46 @@
+[paths]
+local_root = "U:/"
+# paths relative to `local_root`:
+# input midpoints
+midpoints_relpath = "cached-data/midpoints/"
+# delay embedding files (intermediate output)
+des_relpath = "cached-data/DEs"
+# outputs files: delay embedding PCAs for population and individuals and related files
+out_relpath = "cached-data/DE-PCA"
+
+# Location of experiment list and `stages.toml` file on local machine. If relative, resolved from project root.
+ex_list_file = "ex-list-example.csv"
+stage_path = "../../elegans/stages.toml"
+# Directory for log files. Should be a relative path, which is resolved relative to the project root
+# on each machine.
+logdir = "worker-logs-depca"
+
+
+[dist]
+# remote host name or address
+remote = ""
+# number of local and remote workers
+n_local = 3
+n_remote = 0
+# `local_root` and `remote_root` should point to the same directory from local and remote machine
+# through network share (e.g. samba).
+# The remote should have the same version of julia as the one running the pipeline script, 
+# at `$remote_root/julia-$VERSION/bin/julia`
+remote_root = "/home/user"
+# Project root on remote. If relative, resolved from `remote_root`.
+remote_project_root = "ElegansTimeSeries"
+
+
+[params]
+nbins = 10       # per developmental stage
+pca_winlen = 30  # frames per delay-embedding window
+ntrim = 1        # number of midpoints to trim from each end
+
+# windows where head-tail classification has lower confidence that this are omitted
+confidence_threshold = 0.05    
+
+maxoutdim = 50 # Applied only to individuals. Condition PCAs are computed to full dimensionality
+
+# PCA cross-validation parameters
+cv_pca_nsamples = 10
+cv_pca_nwindows = 1000
