@@ -43,6 +43,6 @@ meta_string(; nwells, ntrim, pca_winlen, confidence_threshold) =
 depca_filename(condname, depca_params) = "DE-PCA $condname, $(meta_string(depca_params)).jld2"
 depca_vars_filename(condname, depca_params)  = "DE-PCA vars $condname, $(meta_string(depca_params)).jld2"
 depca_cv_filename(condname, nwindows, nsamples, depca_params) = 
-	"CV PCA errors $condname, $nwindows windows, $nsamples sample, $(meta_string(depca_params)).jld2" 
+	"CV PCA errors, $nwindows windows, $nsamples sample, $condname, $(meta_string(depca_params)).jld2" 
 depca_individual_filename(well, maxoutdim, depca_params) = 
 	"DE-PCA $(well.experiment), $(well.well), $(meta_string(depca_params)), maxoutdim=$maxoutdim.jld2"
