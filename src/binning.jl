@@ -1,5 +1,4 @@
 using Statistics
-#using OnlineStats
 
 function bins(ax, nbins)
     edges = round.(Int, range(first(ax), last(ax)+1, length=nbins+1))

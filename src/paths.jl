@@ -8,7 +8,7 @@ function data_paths(; expected_params = ["video", "contours", "midpoints", "area
 	NamedTuple((Symbol(k), normpath(joinpath(@__DIR__, v))) for (k,v) in paths_dict)
 end
 
-paths = data_paths()
+#paths = data_paths()
 
 function load_depcas(source)
 	d = load(source)

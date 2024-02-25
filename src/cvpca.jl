@@ -24,13 +24,9 @@ function cv_pca_errs(mat, nshuffles, ndims)
 
     errs = zeros(only(axes(ndims)), nshuffles)
     maxoutdim = maximum(ndims)
-    # var_A = fill(NaN, ndims, nshuffles)
     @progress for i in 1:nshuffles
         A,B,C,D = split_mat(mat)
         err_denom = var(A)
-        #var_A[:,i] = cumsum(principalvars(fit(PCA,A))[dims]) ./ (size(A,1) * err_denom)
-        #pca = fit(PCA,A)
-        #var_A[:,i] = 1 .- cumsum(principalvars(pca)[1:ndims]) ./ tvar(pca)
         B_axes, C_scores = pca_cv_decomposition(B,C,D; maxoutdim)
         out_d = size(B_axes, 2)
         @assert out_d == size(C_scores, 1)
@@ -42,7 +38,6 @@ function cv_pca_errs(mat, nshuffles, ndims)
             end
         end
     end
-    # (; errs)#, var_A)
     errs
 end	
 
