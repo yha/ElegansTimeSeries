@@ -467,7 +467,7 @@ summ, task = with_logfiles(logdir) do logger_f
             depca_vars_multibin = let
                 # iterate over wells in the outer loop to use the midpoints cache 
                 # more efficiently, then permute dims 
-                @progress "DEPCA variances" res = [ depca_vars( des[bin,well_i], depcas_multi[bin] ) 
+                @progress "DEPCA variances" res = [ depca_vars( convert(Matrix, des[bin,well_i]), depcas_multi[bin] ) 
                     for bin in 1:nbins_total, well_i in 1:nwells
                 ]
                 vars, tvars, nwindows = unzip(permutedims(res))
