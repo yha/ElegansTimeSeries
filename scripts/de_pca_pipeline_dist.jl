@@ -12,8 +12,8 @@ using TOML
 args = TOML.parsefile("$(@__DIR__)/args.toml")
 paths, dist = args["paths"], args["dist"]
 
-ex_list_file      = normpath(joinpath(local_project_root, paths["ex_list_file"]))
-stage_path        = normpath(joinpath(local_project_root, paths["stage_path"]))
+ex_list_file = normpath(joinpath(local_project_root, paths["ex_list_file"]))
+stage_path   = normpath(joinpath(local_project_root, paths["stage_path"]))
 
 local_root = paths["local_root"]
 logdir = paths["logdir"]
@@ -40,17 +40,17 @@ assert_isfile(stage_path)
 ##
 using Distributed
 
-#n_local, n_remote = 2, 1
 remote = dist["remote"]
 n_local, n_remote = dist["n_local"], dist["n_remote"]
 
-@info "Starting workers..." remote remote_root remote_project_root local_root local_project_root n_local n_remote
+@info "Starting workers..." remote remote_root remote_project_root local_root local_project_root n_local n_remote logdir
 
+rmprocs(setdiff(workers(), [1])...) # remove any existing workers, to allow running this script twice in the same Julia session
 local_procs = cd(local_project_root) do
     addprocs(n_local; exeflags = "--project")
 end
 remote_procs = n_remote == 0 ?
-                [] : # `addprocs` has a bug where where it adds 1 proc when asked for 0
+                Int[] : # `addprocs` has a bug where where it adds 1 proc when asked for 0
                 addprocs([(remote, n_remote)];
                       dir = "$remote_project_root", 
                       exename = "$remote_root/julia-$VERSION/bin/julia",
@@ -101,9 +101,9 @@ stages = sort!(collect(keys(contour_methods)))
 
 # `stringtype=String` avoids having CSV's custom string types in the resulting 
 # .jld2 files (which would require loading CSV.jl to open).
-ex_df = DataFrame(CSV.File(ex_list_file; stringtype=String))
+ex_df = DataFrame(CSV.File(ex_list_file; stringtype = String))
 
-@info "$(nrow(ex_df)) experiments listed..."
+@info "$(nrow(ex_df)) experiments listed in $ex_list_file..."
 
 ex_dict = Dict(strain => Dict(ds => 
                         ex_df.name[(ex_df.DS .== ds) .& (ex_df.strain .== strain)]
@@ -213,6 +213,10 @@ cv_pca_nsamples, cv_pca_nwindows = params["cv_pca_nsamples"], params["cv_pca_nwi
 
 @show nbins pca_winlen ntrim confidence_threshold maxoutdim cv_pca_nsamples cv_pca_nwindows
 
+##
+
+@everywhere include("de_pca_pipeline_funcs.jl")
+
 @everywhere function load_or_compute_des(condition, wells, outpath; nbins, pca_winlen, ntrim, midpoints_cache, stagedict)
     condname = "$(condition[1]) $(condition[2])DS"
     fname = "$outpath/DEs with conf $condname (nbins=$nbins, winlen=$pca_winlen, ntrim=$ntrim).jld2"
@@ -242,27 +246,20 @@ cv_pca_nsamples, cv_pca_nwindows = params["cv_pca_nsamples"], params["cv_pca_nwi
             w in wells
         ]
         des, indices, conf, iters = unzip(res)
-        @info "... saving to `$fname`" 
-        jldsave(fname; pop_des = des, pop_de_indices = indices, conf, iters, wells)
+        @info "... saving to `$fname`"
+        mktemp(dirname(fname)) do path, io
+            @info "...      saving to `$path`"
+            jldsave(path; pop_des = des, pop_de_indices = indices, conf, iters, wells)
+            @info "...      rename `$path` => `$fname`"
+            mv(path, fname)
+        end
+        #jldsave(fname; pop_des = des, pop_de_indices = indices, conf, iters, wells)
         des, indices, conf, iters
     end
 end
 
-@everywhere function depca_vars(de_mat, pca)
-	if isempty(de_mat)
-		vars = fill(NaN, outdim(pca))
-		tvar = NaN
-	else
-		tvar = sum(var, eachrow(de_mat))
-		mat_t = MultivariateStats.transform(pca, de_mat)
-		vars = var.(eachrow(mat_t))
-	end
-	(; vars, tvar, nwindows = size(de_mat,1))
-end
 
 @everywhere using StatsBase: sample
-@everywhere sampledim(a, nsamples, d; replace=true, ordered=false) = 
-            selectdim(a, d, sample(axes(a,d), nsamples; replace, ordered))
 
 ##
 
@@ -297,9 +294,7 @@ end
 
 using WebIO, CSSUtil, Mux
 @everywhere using ObservablePmap
-#@everywhere using Logging: current_logger, with_logger
 @everywhere using LoggingExtras: TeeLogger
-#@everywhere using MiniLoggers
 @everywhere using TerminalLoggers
 @everywhere using Dates
 
@@ -310,7 +305,7 @@ using WebIO, CSSUtil, Mux
 # Do `f` with a log file per worker
 function with_logfiles(f, base_path)
     
-    logfile_streams = Dict{Int,Union{IOStream,Nothing}}( id => nothing for id in vcat(local_procs, remote_procs) )
+    logfile_streams = Dict{Int,IOStream}()
     
     # `base_path` must be relative, as it is used as-is on both local and remote workers
     @assert !isabspath(base_path)
@@ -324,7 +319,7 @@ function with_logfiles(f, base_path)
         id = myid()
         mkpath(path)
         logfile_streams[id] = open("$path/worker-$id.log"; append=true)
-        file_logger = progress_throttle_logger(Second(1), logger_with_timestamps(logfile_streams[myid()]))
+        file_logger = progress_throttle_logger(Second(1), logger_with_timestamps(logfile_streams[id]))
         TeeLogger(terminal_logger, file_logger)
     end
 
@@ -332,7 +327,7 @@ function with_logfiles(f, base_path)
         f(logger_f)
     finally
         for id in keys(logfile_streams)
-            (s = logfile_streams[id]) === nothing || close(s)
+            (s = get(logfile_streams, id, nothing)) === nothing || close(s)
         end
     end
 end
@@ -371,12 +366,6 @@ summ, task = with_logfiles(logdir) do logger_f
         
         @info "$condname: $nwells wells"
         
-        # meta_str = "$condname, n=$nwells, n_trim=$ntrim, windowlength=$pca_winlen, conf_th=$confidence_threshold"
-        # outfile_pca  = "$out_path/DE-PCA $meta_str.jld2"
-        # outfile_vars = "$out_path/DE-PCA vars $meta_str.jld2"
-        # outfile_cv   = "$out_path/CV PCA errors, $cv_pca_nwindows windows, $cv_pca_nsamples sample, $meta_str.jld2" 
-        # outfiles_individual_pca = ["$out_path/individuals/DE-PCA $(well.experiment) $(well.well), $meta_str, maxoutdim=$maxoutdim.jld2"
-        #                         for well in wells]
         depca_params = (; nwells, ntrim, pca_winlen, confidence_threshold)
         outfile_pca  = joinpath(out_path, depca_filename(condname, depca_params))
         outfile_vars = joinpath(out_path, depca_vars_filename(condname, depca_params))
@@ -503,14 +492,19 @@ summ, task = with_logfiles(logdir) do logger_f
     end
 end
 
-        
+
 h = map(x -> style(HTML("<pre>$x</pre>")), summ)
 
 port = rand(8100:8200)
 WebIO.webio_serve(page("/", vbox(h)), port)
 address = "localhost:$port"
 println()
-println("page at $address")
+println("Progress available at $address (copied to clipboard)")
 clipboard(address)
 
-##
+Threads.@spawn begin
+    wait(task)
+    @info "Done"
+end
+
+nothing
