@@ -1,10 +1,11 @@
 """
-Create a "name-sanitized" copy of coordinates, midlines and individuals' DE-PCA data for publishing,
+Create a "name-sanitized" copy of coordinates, midlines and DE-PCA data for publishing,
 where experiments and wells are referred to by consecutive numerals.
+Coordinates, midlines and individuals' DE-PCAs are simply copied to new names, population DE-PCAs
+are also re-saved with the names of wells omitted.
 Also saves the mapping from lab-local name to sanitized names/numerals in CSV files.
 
 Input midpoints directory should have a subdirectory per condition.
-Other (non-individual) DE-PCA data is not copied by this script.
 """
 
 using CSV, DataFrames
